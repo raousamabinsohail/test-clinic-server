@@ -6,7 +6,7 @@ exports.validateRegisterationSchema = (req, res, next) => {
     const userLogin = Joi.object({
       clinicName: Joi.string().max(255).required(),
       email : Joi.string().required(),
-      password : Joi.string().required(),
+      // password : Joi.string().required(),
       operationDate : Joi.string().required(),
       address: Joi.string().min(3).max(255).required(),
       operationHours: Joi.string(),

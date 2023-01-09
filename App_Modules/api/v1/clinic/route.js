@@ -26,6 +26,20 @@ router.post("/login",
   clinicInfos.clinicLogin
 );
 
+/**
+ * Approve Clicic
+ */
+router.put('/approve/:id',
+clinicInfos.activateClinic
+);
+
+/**
+ * Approve Reject
+ */
+router.put('/reject/:id',
+clinicInfos.rejectClinic
+);
+
 
 router.get('/mail',
 clinicInfos.testMail

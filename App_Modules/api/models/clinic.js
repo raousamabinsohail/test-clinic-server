@@ -56,6 +56,13 @@ const clinicInformation = new mongoose.Schema({
     type: Boolean,
     default : false
   },
+  resetPassword: {
+    type: Boolean,
+    default: true,
+  },
+  activationDate:{
+    type: Date,
+  },
   file:{
     idCard : { type : String },
     businessLicence :  { type : String },
