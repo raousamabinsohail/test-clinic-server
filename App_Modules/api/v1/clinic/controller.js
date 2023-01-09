@@ -77,6 +77,34 @@ const ClinicInfos = {
     }
   },
 
+  getAllClinics: async function (req, res, next) {
+    try {
+      // Pagination variables
+      const page = Number(req.query.page) || 1;
+      const offset = Number(req.query.offset) || 10;
+      const skip = page * offset - offset;
+      const query = req.body;
+
+      console.log("")
+
+      const totalData = await ClinicInfo.countDocuments(query);
+      const data = await ClinicInfo.find(query)
+        .lean()
+        .limit(offset)
+        .skip(skip)
+        .sort({ createdDate: -1 });
+
+      res.json({
+        msg: "Clinics fetched Successfully",
+        data: data,
+        total: totalData,
+      });
+    } catch (error) {
+      next(error);
+    }
+  },
+
+
 };
 
 module.exports = ClinicInfos;

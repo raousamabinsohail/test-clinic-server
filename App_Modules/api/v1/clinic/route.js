@@ -12,6 +12,13 @@ router.post("/register",
 );
 
 /**
+ * Clinic Registration route
+ */
+router.get("/",
+  clinicInfos.getAllClinics
+);
+
+/**
  * Clinic Login route
  */
 router.post("/login",
