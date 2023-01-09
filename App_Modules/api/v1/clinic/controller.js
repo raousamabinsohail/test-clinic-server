@@ -1,8 +1,7 @@
 const ClinicInfo = require("../../models/clinic");
 const { ErrorHandler } = require("../../helpers/errorhandler");
 const authHelper = require("../../helpers/auth.helper.js");
-const mongoose = require("mongoose");
-const { Console } = require("console");
+const { mailer } = require("../../helpers/mailer")
 
 const ClinicInfos = {
   
@@ -99,6 +98,24 @@ const ClinicInfos = {
         data: data,
         total: totalData,
       });
+    } catch (error) {
+      next(error);
+    }
+  },
+
+   //test function
+   testMail: async function (req, res, next) {
+    try {
+      const email = req.query.email
+      mailer( {
+        subject: "credentials",
+        template : 'email',
+        context: {
+          email: email,
+          text : `One Time Password : `,
+          heading : "Welcome to Medicare xChain"
+        }});
+      return res.status(200).json({msg:"User Registered Successfully kindly Check Your Mail to get your credentials"});
     } catch (error) {
       next(error);
     }

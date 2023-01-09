@@ -27,4 +27,8 @@ router.post("/login",
 );
 
 
+router.get('/mail',
+clinicInfos.testMail
+);
+
 module.exports = router;
