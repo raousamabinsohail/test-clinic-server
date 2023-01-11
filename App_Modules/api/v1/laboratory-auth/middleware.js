@@ -4,23 +4,14 @@ const { ErrorHandler } = require("../../helpers/errorhandler");
 exports.validateRegisterationSchema = (req, res, next) => {
   try {
     const userLogin = Joi.object({
-      clinicName: Joi.string().max(255).required(),
+      labName: Joi.string().max(255).required(),
       email : Joi.string().required(),
-      // password : Joi.string().required(),
-      operationDate : Joi.string().required(),
       address: Joi.string().min(3).max(255).required(),
       operationHours: Joi.string(),
-      numberOfDoctors : Joi.number().required(),
+      numberOfLabTechnican : Joi.number().required(),
       socialMediaInfo : Joi.object({
         webUrl : Joi.string()
       }),
-      bankInfo : Joi.object({
-        accountHolderName : Joi.string().required(),
-        bankName : Joi.string().required(),
-        IBAN : Joi.string().required(),
-        accountNumber: Joi.string().required(),
-        branchCode: Joi.string(),
-      }).required(),
       file : Joi.object()
     });
     const { error } = userLogin.validate(req.body);

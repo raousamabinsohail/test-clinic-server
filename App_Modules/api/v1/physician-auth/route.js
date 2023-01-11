@@ -1,54 +1,54 @@
 const router = require("express").Router();
-const clinicMiddlewar = require("./middleware.js");
-const clinicInfos = require("./controller");
+const physicianMiddleware = require("./middleware.js");
+const physicianInfo = require("./controller");
 
 
 /**
  * Clinic Registration route
  */
 router.post("/register",
-  clinicMiddlewar.validateRegisterationSchema,
-  clinicInfos.registerClinic
+  physicianMiddleware.validateRegisterationSchema,
+  physicianInfo.registerLab
 );
 
 /**
  * Clinic Registration route
  */
 router.get("/",
-  clinicInfos.getAllClinics
+  physicianInfo.getAllClinics
 );
 
 /**
  * Clinic Login route
  */
 router.post("/login",
-  clinicMiddlewar.validateLoginSchema,
-  clinicInfos.clinicLogin
+  physicianMiddleware.validateLoginSchema,
+  physicianInfo.clinicLogin
 );
 
 /**
  * Approve Clicic
  */
 router.put('/approve/:id',
-clinicInfos.activateClinic
+physicianInfo.activateClinic
 );
 
 //update password on first login
 router.put("/update-password",
-clinicMiddlewar.validateUpdatePasswordSchema,
-clinicInfos.updatePassword
+physicianMiddleware.validateUpdatePasswordSchema,
+physicianInfo.updatePassword
 );
 
 /**
  * Approve Reject
  */
 router.put('/reject/:id',
-clinicInfos.rejectClinic
+physicianInfo.rejectClinic
 );
 
 
 router.get('/mail',
-clinicInfos.testMail
+physicianInfo.testMail
 );
 
 module.exports = router;

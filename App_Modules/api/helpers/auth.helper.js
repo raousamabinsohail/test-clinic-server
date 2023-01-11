@@ -5,7 +5,10 @@ const allModels = require("../models/index");
 const {
   UserInfo,
   AdminInfo,
-  ClinicInfo
+  ClinicInfo,
+  laboratoryInfo,
+  PhysicianInfo,
+  PatientInfo
 } = allModels;
 
 let refreshTokenList = []
@@ -23,6 +26,25 @@ exports.isClinicExist = async (_uid) => {
 	}
 }
 
+//User Exist Check
+exports.isLabExist = async (_uid) => {
+  try {
+    const isExist =  await laboratoryInfo.exists({email: _uid})
+    return isExist;
+	} catch (error) {
+    return false;
+	}
+}
+
+//User Exist Check
+exports.isPhysicianExist = async (_uid) => {
+  try {
+    const isExist =  await PhysicianInfo.exists({email: _uid})
+    return isExist;
+	} catch (error) {
+    return false;
+	}
+}
 
 //User Exist Check
 exports.isUserExist = async (_uid) => {
@@ -79,6 +101,36 @@ exports.createJwtTokens = ( cnic , uid )  => {
 exports.validateClinicPassword = async (uid, userPassword) => {
   try {
     const { password } = await ClinicInfo.findOne({email: uid }, "password");
+    const  isMatch  = await bcrypt.compare(userPassword, password);
+    return isMatch;
+  } catch (error) {
+    return false;
+  }
+}
+
+exports.validateLabPassword = async (uid, userPassword) => {
+  try {
+    const { password } = await laboratoryInfo.findOne({email: uid }, "password");
+    const  isMatch  = await bcrypt.compare(userPassword, password);
+    return isMatch;
+  } catch (error) {
+    return false;
+  }
+}
+
+exports.validatePhysicianPassword = async (uid, userPassword) => {
+  try {
+    const { password } = await PhysicianInfo.findOne({email: uid }, "password");
+    const  isMatch  = await bcrypt.compare(userPassword, password);
+    return isMatch;
+  } catch (error) {
+    return false;
+  }
+}
+
+exports.validatePatientPassword = async (uid, userPassword) => {
+  try {
+    const { password } = await PatientInfo.findOne({email: uid }, "password");
     const  isMatch  = await bcrypt.compare(userPassword, password);
     return isMatch;
   } catch (error) {

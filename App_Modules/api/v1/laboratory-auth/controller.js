@@ -1,19 +1,19 @@
-const ClinicInfo = require("../../models/clinic");
+const labInfoModel = require("../../models/laboratory");
 const { ErrorHandler } = require("../../helpers/errorhandler");
 const authHelper = require("../../helpers/auth.helper.js");
 const { mailer } = require("../../helpers/mailer")
 
 const ClinicInfos = {
   
-  registerClinic: async function (req, res, next) {
+  registerLab: async function (req, res, next) {
     try {
        const data = req.body;
        const { email } = req.body
 
-      const userExists = await ClinicInfo.exists( {email : email })
-      if(userExists) throw new ErrorHandler(404, "Clinic Data Already Exists..");
+      const userExists = await labInfoModel.exists( {email : email })
+      if(userExists) throw new ErrorHandler(404, "Lab Data Already Exists..");
 
-      const scoreData = await new ClinicInfo(data);
+      const scoreData = await new labInfoModel(data);
         scoreData.save((error)=>{
             if(error) throw new ErrorHandler(404, "Data not saved..");
          });
@@ -34,13 +34,12 @@ const ClinicInfos = {
   clinicLogin: async function (req, res, next) {
     try {
       const { email, password } = req.body;
-      
-      const userExist = await authHelper.isClinicExist(email);
+      const userExist = await authHelper.isLabExist(email);
       if (!userExist) {
-        throw new ErrorHandler(404, "Clinic Doesn't Exist");
+        throw new ErrorHandler(404, "Lab Doesn't Exist");
       }
 
-      const isPasswordValid = await authHelper.validateClinicPassword(
+      const isPasswordValid = await authHelper.validateLabPassword(
         email,
         password
       );
@@ -48,11 +47,12 @@ const ClinicInfos = {
         throw new ErrorHandler(401, "Invalid Password or Email");
       }
 
-      const uid = await ClinicInfo.findOne({ email: email }, [
+      const uid = await labInfoModel.findOne({ email: email }, [
         "_id",
-        "clinicName",
+        "labName",
         "address",
-        "numberOfDoctors",
+        "numberOfLabTechnican",
+        "operationHours",
         "isApproved",
         "resetPassword"
       ]);
@@ -61,7 +61,7 @@ const ClinicInfos = {
       }
 
       if (!uid.isApproved) {
-        return res.status(200).json({msg:"Clinic not Approved, please contact administrator"})
+        return res.status(200).json({msg:"Lab not Approved, please contact administrator"})
       }
      
       const tokens = authHelper.createJwtTokens(email, uid._id);
@@ -70,7 +70,7 @@ const ClinicInfos = {
         token : tokens.accessToken,
         success: true,
         message: "Login Sucessfully",
-        clinicData : uid
+        labData : uid
       };
       return res.status(200).json(response);
     } catch (error) {
@@ -88,8 +88,8 @@ const ClinicInfos = {
 
       console.log("")
 
-      const totalData = await ClinicInfo.countDocuments(query);
-      const data = await ClinicInfo.find(query)
+      const totalData = await labInfoModel.countDocuments(query);
+      const data = await labInfoModel.find(query)
         .lean()
         .limit(offset)
         .skip(skip)
@@ -111,8 +111,8 @@ const ClinicInfos = {
       const uid = req.params.id;
 
        //checking the validity of request
-       const clinicData = await ClinicInfo.findById(uid).select('email')
-       if(!clinicData) throw new ErrorHandler(400, "Partial Service Outage");
+       const clinicData = await labInfoModel.findById(uid).select('email')
+       if(!clinicData) throw new ErrorHandler(400, "Invalid Lab ID !");
        
 
        const password = await authHelper.generatePassword()
@@ -130,12 +130,12 @@ const ClinicInfos = {
         resetPassword : true,
         activationDate : date
       };
-      const isUpdated = await ClinicInfo.updateOne(
+      const isUpdated = await labInfoModel.updateOne(
         { _id: uid },
         { $set: data }
       );
       if (!isUpdated) {
-        throw new ErrorHandler(400, "Clinic Not Activated");
+        throw new ErrorHandler(400, "Lab Not Activated");
       }
       mailer({
         subject: "Account Approvde",
@@ -146,7 +146,7 @@ const ClinicInfos = {
           heading : "Login credentials"
         }
        })
-      res.json({ msg: "Clinic Activated Successfully !" });
+      res.json({ msg: "Lab Activated Successfully !" });
     } catch (error) {
       next(error);
     }
@@ -157,7 +157,7 @@ const ClinicInfos = {
       const uid = req.params.id;
 
        //checking the validity of request
-       const clinicData = await ClinicInfo.findById(uid).select('email')
+       const clinicData = await labInfoModel.findById(uid).select('email')
        if(!clinicData) throw new ErrorHandler(400, "Partial Service Outage");
 
        const date = new Date()
@@ -165,12 +165,12 @@ const ClinicInfos = {
         isApproved : false,
         activationDate : date
       };
-      const isUpdated = await ClinicInfo.updateOne(
+      const isUpdated = await labInfoModel.updateOne(
         { _id: uid },
         { $set: data }
       );
       if (!isUpdated) {
-        throw new ErrorHandler(400, "Clinic Not Activated");
+        throw new ErrorHandler(400, "Lab Not Rejected");
       }
       mailer({
         subject: "Account Rejected",
@@ -178,10 +178,10 @@ const ClinicInfos = {
         context: {
           email: clinicData.email,
           text: `Your Email Has Been Rejected`,
-          heading : "Clinic Rejected"
+          heading : "Lab Rejected"
         }
        })
-      res.json({ msg: "Clinic Rejected Successfully !" });
+      res.json({ msg: "Lab Rejected Successfully !" });
     } catch (error) {
       next(error);
     }
@@ -193,7 +193,7 @@ const ClinicInfos = {
       const { password } = req.body;
 
       //checking the validity of request
-      const userData = await ClinicInfo.findById(uid).select('resetPassword')
+      const userData = await labInfoModel.findById(uid).select('resetPassword')
       if(!userData.resetPassword) throw new ErrorHandler(400, "Invalid password Change request");
       
       // hash password
@@ -209,7 +209,7 @@ const ClinicInfos = {
       }
 
       //update query
-      const isUpdated = await ClinicInfo.updateOne(
+      const isUpdated = await labInfoModel.updateOne(
         { _id: uid },
         { $set: data }
       );

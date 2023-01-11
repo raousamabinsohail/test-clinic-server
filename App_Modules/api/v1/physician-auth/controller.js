@@ -1,19 +1,19 @@
-const ClinicInfo = require("../../models/clinic");
+const PhysicianInfoModel = require("../../models/physician");
 const { ErrorHandler } = require("../../helpers/errorhandler");
 const authHelper = require("../../helpers/auth.helper.js");
 const { mailer } = require("../../helpers/mailer")
 
 const ClinicInfos = {
   
-  registerClinic: async function (req, res, next) {
+  registerLab: async function (req, res, next) {
     try {
        const data = req.body;
        const { email } = req.body
+      
+      const userExists = await PhysicianInfoModel.exists( {email : email })
+      if(userExists) throw new ErrorHandler(404, "Physician Data Already Exists..");
 
-      const userExists = await ClinicInfo.exists( {email : email })
-      if(userExists) throw new ErrorHandler(404, "Clinic Data Already Exists..");
-
-      const scoreData = await new ClinicInfo(data);
+      const scoreData = await new PhysicianInfoModel(data);
         scoreData.save((error)=>{
             if(error) throw new ErrorHandler(404, "Data not saved..");
          });
@@ -35,12 +35,12 @@ const ClinicInfos = {
     try {
       const { email, password } = req.body;
       
-      const userExist = await authHelper.isClinicExist(email);
+      const userExist = await authHelper.isPhysicianExist(email);
       if (!userExist) {
-        throw new ErrorHandler(404, "Clinic Doesn't Exist");
+        throw new ErrorHandler(404, "Physician Doesn't Exist");
       }
 
-      const isPasswordValid = await authHelper.validateClinicPassword(
+      const isPasswordValid = await authHelper.validatePhysicianPassword(
         email,
         password
       );
@@ -48,11 +48,13 @@ const ClinicInfos = {
         throw new ErrorHandler(401, "Invalid Password or Email");
       }
 
-      const uid = await ClinicInfo.findOne({ email: email }, [
+      const uid = await PhysicianInfoModel.findOne({ email: email }, [
         "_id",
-        "clinicName",
+        "name",
         "address",
-        "numberOfDoctors",
+        "DOB",
+        "ID",
+        "sex",
         "isApproved",
         "resetPassword"
       ]);
@@ -61,7 +63,7 @@ const ClinicInfos = {
       }
 
       if (!uid.isApproved) {
-        return res.status(200).json({msg:"Clinic not Approved, please contact administrator"})
+        return res.status(200).json({msg:"Physician not Approved, please contact administrator"})
       }
      
       const tokens = authHelper.createJwtTokens(email, uid._id);
@@ -70,7 +72,7 @@ const ClinicInfos = {
         token : tokens.accessToken,
         success: true,
         message: "Login Sucessfully",
-        clinicData : uid
+        physicianInfo : uid
       };
       return res.status(200).json(response);
     } catch (error) {
@@ -86,10 +88,9 @@ const ClinicInfos = {
       const skip = page * offset - offset;
       const query = req.body;
 
-      console.log("")
 
-      const totalData = await ClinicInfo.countDocuments(query);
-      const data = await ClinicInfo.find(query)
+      const totalData = await PhysicianInfoModel.countDocuments(query);
+      const data = await PhysicianInfoModel.find(query)
         .lean()
         .limit(offset)
         .skip(skip)
@@ -111,8 +112,8 @@ const ClinicInfos = {
       const uid = req.params.id;
 
        //checking the validity of request
-       const clinicData = await ClinicInfo.findById(uid).select('email')
-       if(!clinicData) throw new ErrorHandler(400, "Partial Service Outage");
+       const clinicData = await PhysicianInfoModel.findById(uid).select('email')
+       if(!clinicData) throw new ErrorHandler(400, "Invalid Physician Id !");
        
 
        const password = await authHelper.generatePassword()
@@ -130,12 +131,12 @@ const ClinicInfos = {
         resetPassword : true,
         activationDate : date
       };
-      const isUpdated = await ClinicInfo.updateOne(
+      const isUpdated = await PhysicianInfoModel.updateOne(
         { _id: uid },
         { $set: data }
       );
       if (!isUpdated) {
-        throw new ErrorHandler(400, "Clinic Not Activated");
+        throw new ErrorHandler(400, "Physician Not Activated");
       }
       mailer({
         subject: "Account Approvde",
@@ -146,7 +147,7 @@ const ClinicInfos = {
           heading : "Login credentials"
         }
        })
-      res.json({ msg: "Clinic Activated Successfully !" });
+      res.json({ msg: "Physician Activated Successfully !" });
     } catch (error) {
       next(error);
     }
@@ -157,20 +158,20 @@ const ClinicInfos = {
       const uid = req.params.id;
 
        //checking the validity of request
-       const clinicData = await ClinicInfo.findById(uid).select('email')
-       if(!clinicData) throw new ErrorHandler(400, "Partial Service Outage");
+       const clinicData = await PhysicianInfoModel.findById(uid).select('email')
+       if(!clinicData) throw new ErrorHandler(400, "Invalid Physician Id !");
 
        const date = new Date()
        const data = {
         isApproved : false,
         activationDate : date
       };
-      const isUpdated = await ClinicInfo.updateOne(
+      const isUpdated = await PhysicianInfoModel.updateOne(
         { _id: uid },
         { $set: data }
       );
       if (!isUpdated) {
-        throw new ErrorHandler(400, "Clinic Not Activated");
+        throw new ErrorHandler(400, "Physician Not Rejected");
       }
       mailer({
         subject: "Account Rejected",
@@ -178,10 +179,10 @@ const ClinicInfos = {
         context: {
           email: clinicData.email,
           text: `Your Email Has Been Rejected`,
-          heading : "Clinic Rejected"
+          heading : "Physician Rejected"
         }
        })
-      res.json({ msg: "Clinic Rejected Successfully !" });
+      res.json({ msg: "Physician Rejected Successfully !" });
     } catch (error) {
       next(error);
     }
@@ -193,7 +194,7 @@ const ClinicInfos = {
       const { password } = req.body;
 
       //checking the validity of request
-      const userData = await ClinicInfo.findById(uid).select('resetPassword')
+      const userData = await PhysicianInfoModel.findById(uid).select('resetPassword')
       if(!userData.resetPassword) throw new ErrorHandler(400, "Invalid password Change request");
       
       // hash password
@@ -209,7 +210,7 @@ const ClinicInfos = {
       }
 
       //update query
-      const isUpdated = await ClinicInfo.updateOne(
+      const isUpdated = await PhysicianInfoModel.updateOne(
         { _id: uid },
         { $set: data }
       );
