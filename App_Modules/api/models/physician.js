@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const Schema = mongoose.Schema;
 
 const physicianInformation = new mongoose.Schema({
   name: {
@@ -35,8 +36,9 @@ const physicianInformation = new mongoose.Schema({
     type : Object
   },
   isApproved:{
-    type: Boolean,
-    default : false
+    type: String,
+    enum : ['PENDING','APPROVED','REJECTED'],
+    default : "PENDING"
   },
   resetPassword: {
     type: Boolean,
@@ -45,6 +47,12 @@ const physicianInformation = new mongoose.Schema({
   activationDate:{
     type: Date,
   },
+  clinics:[
+    {
+      type: Schema.Types.ObjectId,
+      ref: "clinic"
+    }
+],
   file:{
     idCard : { type : String },
     medicalCertificate :  { type : String },

@@ -47,8 +47,13 @@ laboratoryInfo.rejectClinic
 );
 
 
-router.get('/mail',
-laboratoryInfo.testMail
+/**
+ * Assign Clinics
+ */
+router.put('/assign-clinic/:id',
+laboratoryMiddleware.validateAssignClinicData,
+laboratoryInfo.assignClinic
 );
+
 
 module.exports = router;

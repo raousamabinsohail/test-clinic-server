@@ -9,6 +9,7 @@ exports.validateRegisterationSchema = (req, res, next) => {
       address: Joi.string().min(3).max(255).required(),
       operationHours: Joi.string(),
       numberOfLabTechnican : Joi.number().required(),
+      clinics : Joi.array().items(Joi.string().required()),
       socialMediaInfo : Joi.object({
         webUrl : Joi.string()
       }),
@@ -44,6 +45,21 @@ exports.validateUpdatePasswordSchema = (req, res, next) => {
   try {
     const data = Joi.object({
       password : Joi.string().required()
+    });
+    const { error } = data.validate(req.body);
+    if (error) {
+      throw new ErrorHandler(400, error.details[0].message);
+    }
+    next();
+  } catch (error) {
+    next(error);
+  }
+};
+
+exports.validateAssignClinicData = (req, res, next) => {
+  try {
+    const data = Joi.object({
+      clinics : Joi.array().items(Joi.string().required()).required()
     });
     const { error } = data.validate(req.body);
     if (error) {

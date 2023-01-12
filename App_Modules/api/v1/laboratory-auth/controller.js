@@ -60,8 +60,12 @@ const ClinicInfos = {
         throw new ErrorHandler(404, "Internal Server Error");
       }
 
-      if (!uid.isApproved) {
-        return res.status(200).json({msg:"Lab not Approved, please contact administrator"})
+      if (uid.isApproved == 'PENDING') {
+        return res.status(200).json({msg:"Physician not Approved, please contact administrator"})
+      }
+
+      if (uid.isApproved == 'REJECTED') {
+        return res.status(200).json({msg:"Physician Rejected, please contact administrator"})
       }
      
       const tokens = authHelper.createJwtTokens(email, uid._id);
@@ -85,8 +89,6 @@ const ClinicInfos = {
       const offset = Number(req.query.offset) || 10;
       const skip = page * offset - offset;
       const query = req.body;
-
-      console.log("")
 
       const totalData = await labInfoModel.countDocuments(query);
       const data = await labInfoModel.find(query)
@@ -125,7 +127,7 @@ const ClinicInfos = {
  
        const date = new Date()
        const data = {
-        isApproved : true,
+        isApproved : 'APPROVED',
         password : hashPassword,
         resetPassword : true,
         activationDate : date
@@ -162,7 +164,7 @@ const ClinicInfos = {
 
        const date = new Date()
        const data = {
-        isApproved : false,
+        isApproved : 'REJECTED',
         activationDate : date
       };
       const isUpdated = await labInfoModel.updateOne(
@@ -222,26 +224,31 @@ const ClinicInfos = {
     }
   },
 
-
-
-   //test function
-   testMail: async function (req, res, next) {
+  assignClinic: async function (req, res, next) {
     try {
-      const email = req.query.email
-      mailer( {
-        subject: "credentials",
-        template : 'email',
-        context: {
-          email: email,
-          text : `One Time Password : `,
-          heading : "Welcome to Medicare xChain"
-        }});
-      return res.status(200).json({msg:"User Registered Successfully kindly Check Your Mail to get your credentials"});
+      const uid = req.params.id;
+      const clinics = req.body.clinics
+       
+      //checking the validity of request
+       const clinicData = await labInfoModel.findById(uid).select('email')
+       if(!clinicData) throw new ErrorHandler(400, "Invalid Patient Id !");
+
+       const data = {
+        clinics : clinics
+      };
+      const isUpdated = await labInfoModel.updateOne(
+        { _id: uid },
+        { $set: data }
+      );
+      if (!isUpdated) {
+        throw new ErrorHandler(400, "Clinics not assigned");
+      }
+      
+      res.json({ msg: "Clinic Assigned Successfully !" });
     } catch (error) {
       next(error);
     }
   },
-
 
 };
 

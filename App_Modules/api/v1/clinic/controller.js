@@ -60,8 +60,12 @@ const ClinicInfos = {
         throw new ErrorHandler(404, "Internal Server Error");
       }
 
-      if (!uid.isApproved) {
-        return res.status(200).json({msg:"Clinic not Approved, please contact administrator"})
+      if (uid.isApproved == 'PENDING') {
+        return res.status(200).json({msg:"CLinic not Approved, please contact administrator"})
+      }
+
+      if (uid.isApproved == 'REJECTED') {
+        return res.status(200).json({msg:"Clinic Rejected, please contact administrator"})
       }
      
       const tokens = authHelper.createJwtTokens(email, uid._id);
@@ -85,8 +89,6 @@ const ClinicInfos = {
       const offset = Number(req.query.offset) || 10;
       const skip = page * offset - offset;
       const query = req.body;
-
-      console.log("")
 
       const totalData = await ClinicInfo.countDocuments(query);
       const data = await ClinicInfo.find(query)
@@ -125,7 +127,7 @@ const ClinicInfos = {
  
        const date = new Date()
        const data = {
-        isApproved : true,
+        isApproved : 'APPROVED',
         password : hashPassword,
         resetPassword : true,
         activationDate : date
@@ -162,7 +164,7 @@ const ClinicInfos = {
 
        const date = new Date()
        const data = {
-        isApproved : false,
+        isApproved : 'REJECTED',
         activationDate : date
       };
       const isUpdated = await ClinicInfo.updateOne(

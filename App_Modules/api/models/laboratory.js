@@ -1,5 +1,5 @@
 const mongoose = require("mongoose");
-
+const Schema = mongoose.Schema;
 const laboratoryInformation = new mongoose.Schema({
   labName: {
     type: String,
@@ -47,8 +47,9 @@ const laboratoryInformation = new mongoose.Schema({
     type : Object
   },
   isApproved:{
-    type: Boolean,
-    default : false
+    type: String,
+    enum : ['PENDING','APPROVED','REJECTED'],
+    default : "PENDING"
   },
   resetPassword: {
     type: Boolean,
@@ -57,6 +58,12 @@ const laboratoryInformation = new mongoose.Schema({
   activationDate:{
     type: Date,
   },
+  clinics:[
+    {
+      type: Schema.Types.ObjectId,
+      ref: "clinic"
+    }
+  ],
   file:{
     idCard : { type : String },
     businessLicence :  { type : String },

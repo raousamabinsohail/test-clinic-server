@@ -3,7 +3,6 @@ const jwt = require("jsonwebtoken");
 const allModels = require("../models/index");
 
 const {
-  UserInfo,
   AdminInfo,
   ClinicInfo,
   laboratoryInfo,
@@ -138,15 +137,6 @@ exports.validatePatientPassword = async (uid, userPassword) => {
   }
 }
 
-exports.validatePassword = async (uid, userPassword) => {
-  try {
-    const { password } = await UserInfo.findOne({cnic: uid }, "password");
-    const  isMatch  = await bcrypt.compare(userPassword, password);
-    return isMatch;
-  } catch (error) {
-    return false;
-  }
-}
 
 exports.validateAdminPassword = async (cnic, userPassword) => {
   try {

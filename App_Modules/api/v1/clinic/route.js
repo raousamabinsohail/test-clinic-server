@@ -18,6 +18,7 @@ router.get("/",
   clinicInfos.getAllClinics
 );
 
+
 /**
  * Clinic Login route
  */

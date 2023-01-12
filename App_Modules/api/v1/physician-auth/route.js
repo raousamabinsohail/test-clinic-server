@@ -46,9 +46,13 @@ router.put('/reject/:id',
 physicianInfo.rejectClinic
 );
 
-
-router.get('/mail',
-physicianInfo.testMail
+/**
+ * Assign Clinics
+ */
+router.put('/assign-clinic/:id',
+physicianMiddleware.validateAssignClinicData,
+physicianInfo.assignClinic
 );
+
 
 module.exports = router;

@@ -2,8 +2,7 @@ const express = require("express");
 const app = express();
 const router = express.Router();
 
-// open routes 
-router.use("/api/v1/u/auth", require("../api/v1/userAuthentication/route.js"));
+
 
 router.use("/api/v1/a/auth", require("../api/v1/adminAuth/route.js"));
 

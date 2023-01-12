@@ -53,8 +53,9 @@ const clinicInformation = new mongoose.Schema({
     type: Object
   },
   isApproved:{
-    type: Boolean,
-    default : false
+    type: String,
+    enum : ['PENDING','APPROVED','REJECTED'],
+    default : "PENDING"
   },
   resetPassword: {
     type: Boolean,

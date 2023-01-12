@@ -47,6 +47,15 @@ physicianInfo.rejectClinic
 );
 
 
+/**
+ * Assign Clinics
+ */
+router.put('/assign-clinic/:id',
+physicianMiddleware.validateAssignClinicData,
+physicianInfo.assignClinic
+);
+
+
 router.get('/mail',
 physicianInfo.testMail
 );

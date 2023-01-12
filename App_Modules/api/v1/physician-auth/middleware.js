@@ -60,3 +60,18 @@ exports.validateUpdatePasswordSchema = (req, res, next) => {
     next(error);
   }
 };
+
+exports.validateAssignClinicData = (req, res, next) => {
+  try {
+    const data = Joi.object({
+      clinics : Joi.array().items(Joi.string().required()).required()
+    });
+    const { error } = data.validate(req.body);
+    if (error) {
+      throw new ErrorHandler(400, error.details[0].message);
+    }
+    next();
+  } catch (error) {
+    next(error);
+  }
+};

@@ -1,5 +1,4 @@
 const AdminfoModel = require('../../models/admin')
-const UserInfoModel = require('../../models/user')
 const authHelper = require("../../helpers/auth.helper.js");
 const { ErrorHandler } = require("../../helpers/errorhandler");
 
