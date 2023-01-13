@@ -7,7 +7,7 @@ const router = express.Router();
 router.use("/api/v1/a/auth", require("../api/v1/adminAuth/route.js"));
 
 //Clinic auth 
-router.use("/api/v1/c/auth", require("../api/v1/clinic/route.js"));
+router.use("/api/v1/c/auth", require("../api/v1/clinic-auth/route.js"));
 
 //Lab auth 
 router.use("/api/v1/lab/auth", require("../api/v1/laboratory-auth/route.js"));

@@ -12,9 +12,9 @@ router.post("/register",
 );
 
 /**
- * Clinic Registration route
+ * Clinic get route
  */
-router.get("/",
+router.post("/get",
   physicianInfo.getAllClinics
 );
 

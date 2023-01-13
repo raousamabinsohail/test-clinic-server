@@ -14,7 +14,7 @@ router.post("/register",
 /**
  * Clinic Registration route
  */
-router.get("/",
+router.post("/get",
   physicianInfo.getAllClinics
 );
 
