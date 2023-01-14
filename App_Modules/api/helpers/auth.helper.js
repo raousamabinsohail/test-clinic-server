@@ -38,6 +38,16 @@ exports.isLabExist = async (_uid) => {
 //User Exist Check
 exports.isPhysicianExist = async (_uid) => {
   try {
+    const isExist =  await PhysicianInfo.exists({email: _uid})
+    return isExist;
+	} catch (error) {
+    return false;
+	}
+}
+
+//User Exist Check
+exports.isPatientExist = async (_uid) => {
+  try {
     const isExist =  await PatientInfo.exists({email: _uid})
     return isExist;
 	} catch (error) {

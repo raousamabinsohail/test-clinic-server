@@ -35,7 +35,7 @@ const ClinicInfos = {
     try {
       const { email, password } = req.body;
       
-      const userExist = await authHelper.isPhysicianExist(email);
+      const userExist = await authHelper.isPatientExist(email);
       if (!userExist) {
         throw new ErrorHandler(404, "patient Doesn't Exist");
       }
